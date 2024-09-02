@@ -9,6 +9,9 @@ $(TARGET): main.c
 
 .PHONY: clean
 
+run: $(TARGET)
+	./$(TARGET)
+
 clean:
 	rm -f $(TARGET)
 
