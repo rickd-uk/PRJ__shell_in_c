@@ -7,6 +7,7 @@
 // macro to convert a char to its ctrl-key equivalent
 #define ctrl(x) ((x) & 0x1f)
 #define SHELL_PROMPT "$: "
+#define ENTER 10
 #define DATA_START_CAPACITY 128
 
 #define ASSERT(cond, ...)                                                      \
@@ -40,6 +41,12 @@ typedef struct {
   size_t capacity;
 } String;
 
+typedef struct {
+  String *data;
+  size_t count;
+  size_t capacity;
+} Strings;
+
 int main() {
   initscr(); // initialize ncurses screen
   raw();     // disable line buffering
@@ -49,8 +56,7 @@ int main() {
   bool QUIT = false;
 
   String command = {0}; // buffer to store a command
-  String command_his[1024] = {0};
-  size_t command_count = 0;
+  Strings command_his = {0};
 
   size_t line = 0;
 
@@ -63,12 +69,10 @@ int main() {
     case ctrl('q'): // ctrl+q  to quit
       QUIT = true;
       break;
-    case 10: // press enter for new line
+    case ENTER: // press enter for new line
       line++;
-      command_his[command_count++] = command;
-      command.data = NULL;
-      command.count = 0;
-      command.capacity = 0;
+      DA_APPEND(&command_his, command);
+      command = (String){0};
       break;
     default:
       // add char to command buffer
@@ -79,9 +83,9 @@ int main() {
 
   refresh();
   endwin(); // restore normal terminal behavior
-  for (int i = 0; i < command_count; i++) {
-    printf("%.*s\n", (int)command_his[i].count, command_his[i].data);
-    free(command_his[i].data);
+  for (size_t i = 0; i < command_his.count; i++) {
+    printf("%.*s\n", (int)command_his.data[i].count, command_his.data[i].data);
+    free(command_his.data[i].data);
   }
   return 0;
 }

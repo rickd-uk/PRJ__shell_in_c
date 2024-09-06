@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS = -Wall -Wextra -std=c99
+CFLAGS = -Wall -Wextra -Wformat-extra-args -std=c99
 LIBS = -lncurses
 
 TARGET = shell
